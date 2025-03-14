@@ -70,7 +70,7 @@ class ResNet18(nn.Module):
         self.layer2 = self._make_layer(64, 128, stride=2)
         self.layer3 = self._make_layer(128, 256, stride=2)
         self.layer4 = self._make_layer(256, 512, stride=2)
-        self.linear = nn.Linear(512 * 4 * 4, num_classes)
+        self.linear = nn.Linear(512, num_classes)
 
     def _make_layer(self, in_planes, planes, stride):
         layers = []
@@ -88,9 +88,9 @@ class ResNet18(nn.Module):
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
-        x = self.layer4(x)
+        x = self.layer4(x)  # [B, 512, 4, 4]
 
-        x = x.view(x.size(0), -1)
+        x = x.mean(dim=(-1, -2))
         x = self.linear(x)
 
         return x
@@ -122,4 +122,4 @@ class ResNet18(nn.Module):
         plt.show()
 
         # save the figure
-        # plt.savefig(os.path.join(logdir, "first_layer_kernel.pdf"))
+        plt.savefig(os.path.join(logdir, "first_layer_kernel.pdf"))
